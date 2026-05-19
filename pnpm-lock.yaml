@@ -15,7 +15,7 @@ importers:
         version: 0.52.0
       openai:
         specifier: ^4.104.0
-        version: 4.104.0
+        version: 4.104.0(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -34,6 +34,25 @@ importers:
         version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
 
   packages/prompt-template:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.19
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(postcss@8.5.14)(tsx@4.22.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.2
+        version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
+
+  packages/structured-output:
+    dependencies:
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -1076,6 +1095,9 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
 
   '@anthropic-ai/sdk@0.52.0': {}
@@ -1653,7 +1675,7 @@ snapshots:
 
   object-assign@4.1.1: {}
 
-  openai@4.104.0:
+  openai@4.104.0(zod@3.25.76):
     dependencies:
       '@types/node': 18.19.130
       '@types/node-fetch': 2.6.13
@@ -1662,6 +1684,8 @@ snapshots:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
+    optionalDependencies:
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
@@ -1912,3 +1936,5 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  zod@3.25.76: {}

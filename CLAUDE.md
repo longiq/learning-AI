@@ -22,7 +22,7 @@ learning-AI/
 |---|---|---|---|
 | 1 | `llm-client` | `@llm-series/llm-client` | ✅ Done |
 | 2 | `prompt-template` | `@llm-series/prompt-template` | ✅ Done |
-| 3 | `structured-output` | `@llm-series/structured-output` | ⏳ |
+| 3 | `structured-output` | `@llm-series/structured-output` | ✅ Done |
 | 4 | `tool-registry` | `@llm-series/tool-registry` | ⏳ |
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ⏳ |
 | 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
@@ -98,6 +98,24 @@ export { interpolate, extractVariables }
 2. Các cặp user/assistant few-shot examples (không interpolate)
 3. `user` message cuối (có interpolation)
 
+## Module #3: structured-output
+
+**Package:** `@llm-series/structured-output` — `packages/structured-output/`
+
+### Public API
+```typescript
+export type { ParseOptions }
+export { StructuredOutputError, JSONExtractionError, JSONParseError, SchemaValidationError }
+export { extractJSON }
+export { parseStructured }
+```
+
+### Key design decisions
+- `extractJSON(text, options?)` — ưu tiên markdown fence → inline `{}` → inline `[]`; option `preferLast` để lấy match cuối
+- `parseStructured<T>(text, schema, options?)` — pipeline: extract → JSON.parse → Zod safeParse → typed result
+- Error hierarchy extend `StructuredOutputError` (base có `.text`): `JSONExtractionError`, `JSONParseError` (có `.raw`), `SchemaValidationError` (có `.zodError`)
+- Runtime dep duy nhất: `zod`
+
 ## Quy ước chung (áp dụng cho tất cả module)
 - Package scope: `@llm-series/<module-name>`
 - Build: ESM only, tsup, `dts: true`
@@ -106,6 +124,13 @@ export { interpolate, extractVariables }
 - `pnpm.onlyBuiltDependencies: ["esbuild"]` ở root workspace (không phải trong từng package)
 - Không add error handling cho scenarios không thể xảy ra
 - Không add comments trừ khi WHY là non-obvious
+
+## Checklist khi hoàn thành một module mới
+
+1. Cập nhật bảng trạng thái trong `CLAUDE.md` → `✅ Done`
+2. Thêm section `## Module #N` vào `CLAUDE.md` (public API + key design decisions)
+3. Cập nhật bảng trong `README.md` ở root — đổi `⏳` → `✅`, thêm link `[tên](./packages/<module>)`
+4. Tạo `packages/<module>/README.md` theo mẫu prompt-template: tại sao cần, kiến trúc, vị trí trong chuỗi, API nhanh, commands
 
 ## Cách thêm module mới
 
