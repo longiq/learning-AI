@@ -23,7 +23,7 @@ learning-AI/
 | 1 | `llm-client` | `@llm-series/llm-client` | ✅ Done |
 | 2 | `prompt-template` | `@llm-series/prompt-template` | ✅ Done |
 | 3 | `structured-output` | `@llm-series/structured-output` | ✅ Done |
-| 4 | `tool-registry` | `@llm-series/tool-registry` | ⏳ |
+| 4 | `tool-registry` | `@llm-series/tool-registry` | ✅ Done |
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ✅ Done |
 | 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
@@ -116,20 +116,46 @@ export { parseStructured }
 - Error hierarchy extend `StructuredOutputError` (base có `.text`): `JSONExtractionError`, `JSONParseError` (có `.raw`), `SchemaValidationError` (có `.zodError`)
 - Runtime dep duy nhất: `zod`
 
+## Module #4: tool-registry
+
+**Package:** `@llm-series/tool-registry` — `packages/tool-registry/`
+
+### Public API
+```typescript
+export type { ToolDefinition, ToolCall, ToolResult, OpenAIToolDefinition, AnthropicToolDefinition }
+export { ToolRegistryError, ToolNotFoundError, ToolInputError, ToolExecutionError }
+export { ToolRegistry }
+```
+
+### Key design decisions
+- `register(tool)` → `this` — fluent chaining; throws `ToolRegistryError` on duplicate name
+- `execute(name, argsJson)` — pipeline: JSON.parse → Zod safeParse → tool.execute(); each step throws a distinct error type
+- `toOpenAITools()` / `toAnthropicTools()` — convert Zod schemas via `zod-to-json-schema`; Anthropic format uses `input_schema.type = "object"` with `properties` and optional `required`
+- Internal state: `Map<string, ToolDefinition>` với private field — no external mutation
+- `ToolDefinition.execute()` accepts `TInput` generic — typed at definition time; registry calls with `Record<string, unknown>` after Zod validates
+
+### Error hierarchy
+```
+ToolRegistryError (base)
+├── ToolNotFoundError   — tool không tồn tại; có .toolName
+├── ToolInputError      — JSON invalid hoặc Zod fail; có .toolName, .argsJson
+└── ToolExecutionError  — execute() ném lỗi; có .toolName
+```
+
 ## Module #5: simple-react-agent
 
 **Package:** `@llm-series/simple-react-agent` — `packages/simple-react-agent/`
 
 ### Public API
 ```typescript
-export type { AgentOptions, AgentStep, AgentResult, ToolCall, ToolResult, ToolRegistryLike }
+export type { AgentOptions, AgentStep, AgentResult, ToolCall, ToolResult }
 export { AgentError, MaxIterationsError }
 export { runAgent }
 ```
 
 ### Key design decisions
 - `runAgent(options)` → `AgentResult` — stateless function, no class, easy to test
-- `ToolRegistryLike` local interface mirrors `@llm-series/tool-registry` shape — decouples module from tool-registry until rebase
+- `registry: ToolRegistry` — imports real type từ `@llm-series/tool-registry`
 - `adapters.ts` is internal (not exported) — extracts/builds OpenAI & Anthropic tool call message shapes from raw responses
 - `history` typed as `unknown[]` internally — provider tool messages don't conform to `Message[]` but are valid for the SDKs
 - Tool execution errors are caught and returned as `ToolResult.error` — LLM sees the error and can reason about it

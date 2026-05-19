@@ -1,30 +1,11 @@
 import type { LLMClient, Message } from "@llm-series/llm-client";
+import type { ToolCall, ToolResult, ToolRegistry } from "@llm-series/tool-registry";
 
-// Local interface mirrors @llm-series/tool-registry ToolCall shape
-export interface ToolCall {
-  id: string;
-  name: string;
-  argsJson: string;
-}
-
-// Local interface mirrors @llm-series/tool-registry ToolResult shape
-export interface ToolResult {
-  id: string;
-  name: string;
-  output: unknown;
-  error?: string;
-}
-
-// Minimal ToolRegistry interface — compatible with @llm-series/tool-registry ToolRegistry class
-export interface ToolRegistryLike {
-  execute(name: string, argsJson: string): Promise<ToolResult>;
-  toOpenAITools(): unknown[];
-  toAnthropicTools(): unknown[];
-}
+export type { ToolCall, ToolResult };
 
 export interface AgentOptions {
   client: LLMClient;
-  registry: ToolRegistryLike;
+  registry: ToolRegistry;
   messages: Message[];
   model: string;
   maxIterations?: number;

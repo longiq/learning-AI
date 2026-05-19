@@ -1,7 +1,7 @@
 {
-  "name": "@llm-series/simple-react-agent",
+  "name": "@llm-series/tool-registry",
   "version": "0.1.0",
-  "description": "ReAct agent loop using llm-client and tool-registry — module #5",
+  "description": "Define, register, and execute typed LLM tools — module #4",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,8 +21,8 @@
   },
   "files": ["dist"],
   "dependencies": {
-    "@llm-series/llm-client": "workspace:*",
-    "@llm-series/tool-registry": "workspace:*"
+    "zod": "^3.25.0",
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
