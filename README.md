@@ -11,7 +11,7 @@
 | 3 | [`structured-output`](./packages/structured-output) | Parse + validate JSON từ LLM output | ✅ |
 | 4 | [`tool-registry`](./packages/tool-registry) | Tool definitions + dispatch | ✅ |
 | 5 | [`simple-react-agent`](./packages/simple-react-agent) | ReAct agent loop | ✅ |
-| 6 | `memory-store` | Stateful conversation memory | ⏳ |
+| 6 | [`memory-store`](./packages/memory-store) | Stateful conversation memory | ✅ |
 | 7 | `chunker` + `embedder` | Text chunking và embedding | ⏳ |
 | 8 | `vector-store-lite` + `retriever` | Vector search cho RAG | ⏳ |
 | 9 | `agent-router` | Multi-agent routing | ⏳ |

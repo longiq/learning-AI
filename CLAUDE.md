@@ -25,7 +25,7 @@ learning-AI/
 | 3 | `structured-output` | `@llm-series/structured-output` | ✅ Done |
 | 4 | `tool-registry` | `@llm-series/tool-registry` | ✅ Done |
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ✅ Done |
-| 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
+| 6 | `memory-store` | `@llm-series/memory-store` | ✅ Done |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
 | 8 | `vector-store-lite` + `retriever` | — | ⏳ |
 | 9 | `agent-router` | `@llm-series/agent-router` | ⏳ |
@@ -160,6 +160,28 @@ export { runAgent }
 - `history` typed as `unknown[]` internally — provider tool messages don't conform to `Message[]` but are valid for the SDKs
 - Tool execution errors are caught and returned as `ToolResult.error` — LLM sees the error and can reason about it
 - `MaxIterationsError` extends `AgentError` — catch either; `.iterations` field tells you the limit hit
+
+## Module #6: memory-store
+
+**Package:** `@llm-series/memory-store` — `packages/memory-store/`
+
+### Public API
+```typescript
+export type { MemoryEntry, MemoryStoreConfig }
+export { MemoryError }
+export { MemoryStore }
+```
+
+### Key design decisions
+- `MemoryStore` là class (stateful) — khác với `runAgent` stateless ở module 5
+- `#entries` dùng ES private field — không thể mutate từ ngoài
+- `add(role, content, metadata?)` dùng spread-with-condition `...(metadata !== undefined && { metadata })` — bắt buộc bởi `exactOptionalPropertyTypes`
+- `maxEntries` → sliding window: `splice(0, length - maxEntries)` loại bỏ entry cũ nhất
+- `systemPrompt` không lưu vào `#entries` — chỉ thêm khi `getMessages()` được gọi, giữ lịch sử sạch
+- `getMessages()` dùng `for...of` — tránh index access, không bị `noUncheckedIndexedAccess` ảnh hưởng
+- `toJSON()` / `static fromJSON()` cho session persistence
+- `fromJSON()` bypass `add()` — restore trung thực, không để `maxEntries` làm mất dữ liệu khi deserialization
+- Dependency duy nhất: `@llm-series/llm-client` (lấy `Message`, `MessageRole` types)
 
 ## Quy ước chung (áp dụng cho tất cả module)
 - Package scope: `@llm-series/<module-name>`
