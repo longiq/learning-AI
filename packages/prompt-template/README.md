@@ -107,7 +107,7 @@ simple-react-agent (#5)  ← agent hoàn chỉnh đầu tiên
 ## Commands
 
 ```bash
-npm test           # chạy test (40 cases)
-npm run typecheck  # type-check không emit
-npm run build      # compile sang dist/
+pnpm test       # chạy test (40 cases)
+pnpm typecheck  # type-check không emit
+pnpm build      # compile sang dist/
 ```
