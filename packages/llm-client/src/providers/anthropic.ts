@@ -97,6 +97,7 @@ export class AnthropicClient implements LLMClient {
           temperature: Math.min(1, options.temperature),
         }),
         ...(options.stop !== undefined && { stop_sequences: options.stop }),
+        ...(options.tools ? { tools: options.tools as never } : {}),
         stream: false,
       });
 

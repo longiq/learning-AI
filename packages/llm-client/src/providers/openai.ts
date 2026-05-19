@@ -71,6 +71,7 @@ export class OpenAIClient implements LLMClient {
         ...(options.temperature !== undefined && { temperature: options.temperature }),
         ...(options.maxTokens !== undefined && { max_tokens: options.maxTokens }),
         ...(options.stop !== undefined && { stop: options.stop }),
+        ...(options.tools ? { tools: options.tools as never } : {}),
         stream: false,
       });
 
