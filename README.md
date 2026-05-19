@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 1 | [`llm-client`](./packages/llm-client) | Unified interface cho OpenAI, Anthropic | ✅ |
 | 2 | [`prompt-template`](./packages/prompt-template) | Template `{{variable}}` → `Message[]` | ✅ |
-| 3 | `structured-output` | Schema validation cho LLM output | ⏳ |
+| 3 | [`structured-output`](./packages/structured-output) | Parse + validate JSON từ LLM output | ✅ |
 | 4 | `tool-registry` | Tool definitions + dispatch | ⏳ |
 | 5 | `simple-react-agent` | ReAct agent loop | ⏳ |
 | 6 | `memory-store` | Stateful conversation memory | ⏳ |
