@@ -24,7 +24,7 @@ learning-AI/
 | 2 | `prompt-template` | `@llm-series/prompt-template` | ✅ Done |
 | 3 | `structured-output` | `@llm-series/structured-output` | ✅ Done |
 | 4 | `tool-registry` | `@llm-series/tool-registry` | ✅ Done |
-| 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ⏳ |
+| 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ✅ Done |
 | 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
 | 8 | `vector-store-lite` + `retriever` | — | ⏳ |
@@ -131,7 +131,7 @@ export { ToolRegistry }
 - `register(tool)` → `this` — fluent chaining; throws `ToolRegistryError` on duplicate name
 - `execute(name, argsJson)` — pipeline: JSON.parse → Zod safeParse → tool.execute(); each step throws a distinct error type
 - `toOpenAITools()` / `toAnthropicTools()` — convert Zod schemas via `zod-to-json-schema`; Anthropic format uses `input_schema.type = "object"` with `properties` and optional `required`
-- Internal state: `Map<string, ToolDefinition>` with private field (`#tools`) — no external mutation
+- Internal state: `Map<string, ToolDefinition>` với private field — no external mutation
 - `ToolDefinition.execute()` accepts `TInput` generic — typed at definition time; registry calls with `Record<string, unknown>` after Zod validates
 
 ### Error hierarchy
@@ -141,6 +141,25 @@ ToolRegistryError (base)
 ├── ToolInputError      — JSON invalid hoặc Zod fail; có .toolName, .argsJson
 └── ToolExecutionError  — execute() ném lỗi; có .toolName
 ```
+
+## Module #5: simple-react-agent
+
+**Package:** `@llm-series/simple-react-agent` — `packages/simple-react-agent/`
+
+### Public API
+```typescript
+export type { AgentOptions, AgentStep, AgentResult, ToolCall, ToolResult }
+export { AgentError, MaxIterationsError }
+export { runAgent }
+```
+
+### Key design decisions
+- `runAgent(options)` → `AgentResult` — stateless function, no class, easy to test
+- `registry: ToolRegistry` — imports real type từ `@llm-series/tool-registry`
+- `adapters.ts` is internal (not exported) — extracts/builds OpenAI & Anthropic tool call message shapes from raw responses
+- `history` typed as `unknown[]` internally — provider tool messages don't conform to `Message[]` but are valid for the SDKs
+- Tool execution errors are caught and returned as `ToolResult.error` — LLM sees the error and can reason about it
+- `MaxIterationsError` extends `AgentError` — catch either; `.iterations` field tells you the limit hit
 
 ## Quy ước chung (áp dụng cho tất cả module)
 - Package scope: `@llm-series/<module-name>`

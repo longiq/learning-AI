@@ -1,0 +1,33 @@
+{
+  "name": "@llm-series/simple-react-agent",
+  "version": "0.1.0",
+  "description": "ReAct agent loop using llm-client and tool-registry — module #5",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build && pnpm run typecheck"
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@llm-series/llm-client": "workspace:*",
+    "@llm-series/tool-registry": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.2"
+  }
+}

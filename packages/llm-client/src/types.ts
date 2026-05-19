@@ -11,6 +11,7 @@ export interface CompletionOptions {
   temperature?: number;
   maxTokens?: number;
   stop?: string[];
+  tools?: unknown[];
 }
 
 export interface CompletionResult {
