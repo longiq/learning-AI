@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/llm-client:
     dependencies:
       '@anthropic-ai/sdk':
         specifier: ^0.52.0
@@ -24,6 +26,21 @@ importers:
       tsx:
         specifier: ^4.22.2
         version: 4.22.2
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.2
+        version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
+
+  packages/prompt-template:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.19
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(postcss@8.5.14)(tsx@4.22.2)(typescript@5.9.3)
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
