@@ -1,0 +1,85 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/lab/1-chat",
+      "regex": "^/lab/1\\-chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/1\\-chat(?:/)?$"
+    },
+    {
+      "page": "/lab/2-structured",
+      "regex": "^/lab/2\\-structured(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/2\\-structured(?:/)?$"
+    },
+    {
+      "page": "/lab/3-agent",
+      "regex": "^/lab/3\\-agent(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/3\\-agent(?:/)?$"
+    },
+    {
+      "page": "/lab/4-memory",
+      "regex": "^/lab/4\\-memory(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/4\\-memory(?:/)?$"
+    },
+    {
+      "page": "/lab/5-rag",
+      "regex": "^/lab/5\\-rag(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/5\\-rag(?:/)?$"
+    },
+    {
+      "page": "/lab/6-router",
+      "regex": "^/lab/6\\-router(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lab/6\\-router(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}
