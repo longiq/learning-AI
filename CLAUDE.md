@@ -26,7 +26,7 @@ learning-AI/
 | 4 | `tool-registry` | `@llm-series/tool-registry` | ✅ Done |
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ✅ Done |
 | 6 | `memory-store` | `@llm-series/memory-store` | ✅ Done |
-| 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
+| 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ✅ Done |
 | 8 | `vector-store-lite` + `retriever` | — | ⏳ |
 | 9 | `agent-router` | `@llm-series/agent-router` | ⏳ |
 
@@ -198,6 +198,53 @@ export { MemoryStore }
 2. Thêm section `## Module #N` vào `CLAUDE.md` (public API + key design decisions)
 3. Cập nhật bảng trong `README.md` ở root — đổi `⏳` → `✅`, thêm link `[tên](./packages/<module>)`
 4. Tạo `packages/<module>/README.md` theo mẫu prompt-template: tại sao cần, kiến trúc, vị trí trong chuỗi, API nhanh, commands
+
+## Module #7: chunker + embedder
+
+### Package `@llm-series/chunker` — `packages/chunker/`
+
+#### Public API
+```typescript
+export type { Chunk, ChunkOptions, ChunkStrategy }
+export { ChunkerError }
+export { chunk }
+```
+
+#### Key design decisions
+- `chunk(text, options)` → `Chunk[]` — pure function, no state
+- Two strategies: `"character"` (fixed byte window) and `"sentence"` (semantic boundaries)
+- `Chunk` has `{ text, index, start, end }` — `text === original.slice(start, end)` always holds
+- `overlap` chars of the previous chunk re-appear at the start of the next chunk
+- `overlap === 0` path is handled separately to avoid the off-by-one in the backward-scan logic
+- Throws `ChunkerError` for invalid options (size ≤ 0, overlap < 0, overlap ≥ size)
+
+---
+
+### Package `@llm-series/embedder` — `packages/embedder/`
+
+#### Public API
+```typescript
+export type { EmbedderConfig, EmbeddingResult }
+export { EmbedderError, EmbedderAuthError, EmbedderRateLimitError, EmbedderProviderError }
+export { Embedder }
+```
+
+#### Key design decisions
+- `Embedder` class (stateful) — holds config, resolves baseURL/model defaults at construction
+- `embed(text)` / `embedBatch(texts)` — both delegate to single `#request()` private method
+- `embedBatch([])` returns `[]` without making a network request
+- Results from batch are sorted by `index` field — OpenAI does not guarantee order
+- `fetch?: typeof globalThis.fetch` on config → Ollama/LM Studio compatible, easy to mock in tests
+- Default model: `"text-embedding-3-small"`, default baseURL: `"https://api.openai.com/v1"`
+- Error hierarchy mirrors llm-client pattern: auth / rate-limit / provider
+
+#### Error hierarchy
+```
+EmbedderError (base)
+├── EmbedderAuthError        — 401
+├── EmbedderRateLimitError   — 429; retryAfter?: number
+└── EmbedderProviderError    — 5xx; statusCode?: number
+```
 
 ## Cách thêm module mới
 
