@@ -1,34 +1,40 @@
-# LLM Series — Project Memory
+# Learning AI — Project Memory
 
 ## Mục tiêu
-Build 9 module nhỏ để học modern LLM/agent architecture. Mỗi module là một GitHub repo riêng, mỗi session Claude Code riêng.
+Build 9 module nhỏ để học modern LLM/agent architecture. Tất cả module nằm trong monorepo này.
+
+## Cấu trúc monorepo
+
+```
+learning-AI/
+├── packages/
+│   ├── llm-client/       ✅ Module #1
+│   ├── prompt-template/  ✅ Module #2
+│   └── ...               (các module tiếp theo)
+├── package.json          (workspace root, private)
+├── pnpm-workspace.yaml
+└── CLAUDE.md
+```
 
 ## Thứ tự module
 
-| # | Module | Repo | Status |
+| # | Module | Package | Status |
 |---|---|---|---|
-| 1 | `llm-client` | `longiq/llm-client` | ✅ Done |
-| 2 | `prompt-template` | — | ⏳ |
-| 3 | `structured-output` | — | ⏳ |
-| 4 | `tool-registry` | — | ⏳ |
-| 5 | `simple-react-agent` | — | ⏳ |
-| 6 | `memory-store` | — | ⏳ |
-| 7 | `chunker` + `embedder` | — | ⏳ |
+| 1 | `llm-client` | `@llm-series/llm-client` | ✅ Done |
+| 2 | `prompt-template` | `@llm-series/prompt-template` | ✅ Done |
+| 3 | `structured-output` | `@llm-series/structured-output` | ⏳ |
+| 4 | `tool-registry` | `@llm-series/tool-registry` | ⏳ |
+| 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ⏳ |
+| 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
+| 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
 | 8 | `vector-store-lite` + `retriever` | — | ⏳ |
-| 9 | `agent-router` | — | ⏳ |
+| 9 | `agent-router` | `@llm-series/agent-router` | ⏳ |
 
-## Module #1: llm-client — Đã hoàn thành
+## Module #1: llm-client
 
-**Repo:** `longiq/llm-client`  
-**PR:** https://github.com/longiq/llm-client/pull/1  
-**Package name:** `@llm-series/llm-client`
+**Package:** `@llm-series/llm-client` — `packages/llm-client/`
 
-### Stack
-- TypeScript 5.x, ESM only (`"type": "module"`)
-- pnpm, tsup (build), vitest (test)
-- `tsconfig`: strict + `exactOptionalPropertyTypes` + `noUncheckedIndexedAccess`
-
-### Public API (src/index.ts)
+### Public API
 ```typescript
 // Types
 export type { Message, MessageRole, CompletionOptions, CompletionResult, LLMClient, OpenAIClientConfig, AnthropicClientConfig }
@@ -49,7 +55,6 @@ export { OpenAIClient, AnthropicClient }
 - `maxRetries: 0` trong SDK constructors — retry logic thuộc về agent layer
 - `baseURL` trên cả hai config → Ollama/LM Studio compatible
 - `fetch?: typeof globalThis.fetch` trên config → dễ mock trong tests
-- Direct deps (không phải peer deps) cho `openai` + `@anthropic-ai/sdk`
 
 ### LLMClient interface
 ```typescript
@@ -69,26 +74,45 @@ LLMError (base, có provider field)
 └── LLMProviderError      — 5xx, có statusCode?: number
 ```
 
-## Cách downstream modules link về llm-client
+## Module #2: prompt-template
 
-```json
-// package.json của module kế tiếp
-{
-  "dependencies": {
-    "@llm-series/llm-client": "file:../llm-client"
-  }
-}
-```
+**Package:** `@llm-series/prompt-template` — `packages/prompt-template/`
 
+### Public API
 ```typescript
-import { createClient, collectStream, LLMRateLimitError } from "@llm-series/llm-client";
-import type { LLMClient, Message, CompletionOptions, CompletionResult } from "@llm-series/llm-client";
+export type { Message, MessageRole, PromptTemplateConfig, TemplateVariables, FewShotExample }
+export { TemplateRenderError }
+export { PromptTemplate }
+export { interpolate, extractVariables }
 ```
+
+### Key design decisions
+- `{{variableName}}` syntax — regex `[a-zA-Z_][a-zA-Z0-9_-]*`
+- `render(vars)` → `Message[]` — output dùng trực tiếp trong `CompletionOptions.messages`
+- `TemplateRenderError` thrown với `missingVariables[]` khi thiếu variable
+- `withExamples()` → immutable builder pattern cho few-shot
+- Biến thừa trong vars bị bỏ qua silently
+
+### render() output order
+1. `system` message (nếu có)
+2. Các cặp user/assistant few-shot examples (không interpolate)
+3. `user` message cuối (có interpolation)
 
 ## Quy ước chung (áp dụng cho tất cả module)
 - Package scope: `@llm-series/<module-name>`
 - Build: ESM only, tsup, `dts: true`
 - Test: vitest, mock bằng custom fetch injection (không dùng MSW)
+- tsconfig: strict + `exactOptionalPropertyTypes` + `noUncheckedIndexedAccess`
+- `pnpm.onlyBuiltDependencies: ["esbuild"]` ở root workspace (không phải trong từng package)
 - Không add error handling cho scenarios không thể xảy ra
 - Không add comments trừ khi WHY là non-obvious
-- Mỗi module có `pnpm.onlyBuiltDependencies: ["esbuild"]` trong package.json
+
+## Cách thêm module mới
+
+```bash
+mkdir packages/<module-name>
+# Tạo package.json với name "@llm-series/<module-name>"
+# Dependency vào module khác trong workspace:
+#   "@llm-series/llm-client": "workspace:*"
+pnpm install   # từ root, pnpm tự wire up workspace
+```
