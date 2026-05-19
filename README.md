@@ -13,7 +13,7 @@
 | 5 | [`simple-react-agent`](./packages/simple-react-agent) | ReAct agent loop | ✅ |
 | 6 | [`memory-store`](./packages/memory-store) | Stateful conversation memory | ✅ |
 | 7 | [`chunker`](./packages/chunker) + [`embedder`](./packages/embedder) | Text chunking và embedding | ✅ |
-| 8 | `vector-store-lite` + `retriever` | Vector search cho RAG | ⏳ |
+| 8 | [`vector-store-lite`](./packages/vector-store-lite) + [`retriever`](./packages/retriever) | Vector search cho RAG | ✅ |
 | 9 | `agent-router` | Multi-agent routing | ⏳ |
 
 ## Dependency tree

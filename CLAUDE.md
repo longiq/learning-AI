@@ -27,7 +27,7 @@ learning-AI/
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ✅ Done |
 | 6 | `memory-store` | `@llm-series/memory-store` | ✅ Done |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ✅ Done |
-| 8 | `vector-store-lite` + `retriever` | — | ⏳ |
+| 8 | `vector-store-lite` + `retriever` | `@llm-series/vector-store-lite`, `@llm-series/retriever` | ✅ Done |
 | 9 | `agent-router` | `@llm-series/agent-router` | ⏳ |
 
 ## Module #1: llm-client
@@ -245,6 +245,55 @@ EmbedderError (base)
 ├── EmbedderRateLimitError   — 429; retryAfter?: number
 └── EmbedderProviderError    — 5xx; statusCode?: number
 ```
+
+## Module #8: vector-store-lite + retriever
+
+### Package `@llm-series/vector-store-lite` — `packages/vector-store-lite/`
+
+#### Public API
+```typescript
+export type { VectorStoreEntry, VectorStoreConfig, SimilarityResult }
+export { VectorStoreError, VectorStoreDimensionError }
+export { VectorStoreLite }
+```
+
+#### Key design decisions
+- `VectorStoreLite` là class (stateful) — `Map<string, VectorStoreEntry>` internal
+- `#dim` set khi `add()` đầu tiên; enforce dimension consistency cho tất cả subsequent entries
+- `clear()` reset `#dim = undefined` — store sau clear chấp nhận dimension mới
+- `addBatch()` partial-commit: entries trước lỗi được lưu, entry lỗi throw, entries sau không thêm
+- `query()` compute cosine similarity toàn bộ store → filter minScore → sort desc → slice topK
+- `cosineSimilarity(a, b)` single-pass, trả 0 khi zero vector, tách ra `similarity.ts`
+- `similarityFn` injectable qua config — dễ test với custom function
+- `toJSON()` shallow copy; `fromJSON()` bypass `add()` (set `#dim` trực tiếp, không re-validate)
+- Không có external runtime deps
+
+#### Error hierarchy
+```
+VectorStoreError (base)
+└── VectorStoreDimensionError  — có .expected: number, .actual: number
+```
+
+---
+
+### Package `@llm-series/retriever` — `packages/retriever/`
+
+#### Public API
+```typescript
+export type { RetrieverConfig, RetrievedChunk }
+export { RetrieverError }
+export { Retriever }
+```
+
+#### Key design decisions
+- `Retriever` class nhận `Embedder` instance + optional `RetrieverConfig`
+- `addDocument(text, metadata?)` → `chunk()` → `embedBatch()` (một API call) → `store.add()` per chunk
+- Metadata layout trong VectorStoreEntry: `{ text, chunkIndex, start, end, docMetadata?: userMetadata }` — nested key tránh collision với structural fields
+- `retrieve(query, topK, minScore?)` → `embed(query)` → `store.query()` → map to `RetrievedChunk[]`
+- ID generation: `randomUUID()` từ `node:crypto` — không cần external dep
+- Default `chunkOptions`: `{ size: 512, overlap: 64 }` (character strategy)
+- `store` getter cho phép access VectorStoreLite để persist/inspect
+- Dependencies: `@llm-series/chunker`, `@llm-series/embedder`, `@llm-series/vector-store-lite`
 
 ## Cách thêm module mới
 
