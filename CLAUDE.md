@@ -28,7 +28,7 @@ learning-AI/
 | 6 | `memory-store` | `@llm-series/memory-store` | ✅ Done |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ✅ Done |
 | 8 | `vector-store-lite` + `retriever` | `@llm-series/vector-store-lite`, `@llm-series/retriever` | ✅ Done |
-| 9 | `agent-router` | `@llm-series/agent-router` | ⏳ |
+| 9 | `agent-router` | `@llm-series/agent-router` | ✅ Done |
 
 ## Module #1: llm-client
 
@@ -294,6 +294,36 @@ export { Retriever }
 - Default `chunkOptions`: `{ size: 512, overlap: 64 }` (character strategy)
 - `store` getter cho phép access VectorStoreLite để persist/inspect
 - Dependencies: `@llm-series/chunker`, `@llm-series/embedder`, `@llm-series/vector-store-lite`
+
+## Module #9: agent-router
+
+**Package:** `@llm-series/agent-router` — `packages/agent-router/`
+
+### Public API
+```typescript
+export type { RouterAgent, RouterOptions, RouterResult }
+export { RouterError, NoAgentsError, UnknownAgentError, AgentRunError }
+export { AgentRouter }
+```
+
+### Key design decisions
+- `AgentRouter` là class (stateful) — giữ `Map<string, RouterAgent>` qua nhiều lần `route()`
+- `register(agent)` → `this` — fluent chaining; throws `RouterError` on duplicate name
+- `route(messages)` → routing LLM call → `parseStructured` (Zod) → dispatch → `RouterResult`
+- Routing prompt liệt kê tất cả agents với name+description, yêu cầu LLM trả `{"agent": "<name>"}`
+- Chỉ lấy **last user message** làm query cho classifier — history không liên quan đến routing decision
+- `RouterAgent.run(messages: Message[])` nhận full messages gốc (không phải routing messages)
+- `parseStructured` throws `StructuredOutputError` subtypes khi LLM trả JSON không hợp lệ — propagate unwrapped
+- `maxTokens` dùng spread-with-condition `...(x !== undefined ? { maxTokens: x } : {})` — bắt buộc bởi `exactOptionalPropertyTypes`
+- Dependencies: `@llm-series/llm-client`, `@llm-series/structured-output`, `zod`
+
+### Error hierarchy
+```
+RouterError (base)
+├── NoAgentsError       — no agents registered
+├── UnknownAgentError   — LLM picked unknown name; có .agentName
+└── AgentRunError       — agent.run() threw; có .agentName, .cause qua ErrorOptions
+```
 
 ## Cách thêm module mới
 
