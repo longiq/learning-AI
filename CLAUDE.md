@@ -3,6 +3,10 @@
 ## Mục tiêu
 Build 9 module nhỏ để học modern LLM/agent architecture. Tất cả module nằm trong monorepo này.
 
+## Quy tắc GitHub (dự án cá nhân)
+- Sau khi push branch và tạo PR, nếu CI pass và không có conflict → **merge PR ngay lập tức** bằng `mcp__github__merge_pull_request` (squash), không cần chờ review hay enable auto-merge
+- Không cần hỏi xác nhận trước khi merge
+
 ## Cấu trúc monorepo
 
 ```
