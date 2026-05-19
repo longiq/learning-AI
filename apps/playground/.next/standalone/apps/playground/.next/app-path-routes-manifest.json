@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/agent/route": "/api/agent",
+  "/api/chat/route": "/api/chat",
+  "/api/memory/route": "/api/memory",
+  "/api/rag/query/route": "/api/rag/query",
+  "/api/router/route": "/api/router",
+  "/api/structured/route": "/api/structured",
+  "/api/rag/ingest/route": "/api/rag/ingest",
+  "/lab/3-agent/page": "/lab/3-agent",
+  "/lab/1-chat/page": "/lab/1-chat",
+  "/lab/4-memory/page": "/lab/4-memory",
+  "/lab/2-structured/page": "/lab/2-structured",
+  "/lab/5-rag/page": "/lab/5-rag",
+  "/page": "/",
+  "/lab/6-router/page": "/lab/6-router"
+}
