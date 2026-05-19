@@ -97,6 +97,31 @@ importers:
         specifier: ^3.2.2
         version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
 
+  packages/retriever:
+    dependencies:
+      '@llm-series/chunker':
+        specifier: workspace:*
+        version: link:../chunker
+      '@llm-series/embedder':
+        specifier: workspace:*
+        version: link:../embedder
+      '@llm-series/vector-store-lite':
+        specifier: workspace:*
+        version: link:../vector-store-lite
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.19
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(postcss@8.5.14)(tsx@4.22.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.2
+        version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
+
   packages/simple-react-agent:
     dependencies:
       '@llm-series/llm-client':
@@ -146,6 +171,21 @@ importers:
       zod-to-json-schema:
         specifier: ^3.24.5
         version: 3.25.2(zod@3.25.76)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.19
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(postcss@8.5.14)(tsx@4.22.2)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.2
+        version: 3.2.4(@types/node@22.19.19)(tsx@4.22.2)
+
+  packages/vector-store-lite:
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
