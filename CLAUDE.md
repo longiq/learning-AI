@@ -23,7 +23,7 @@ learning-AI/
 | 1 | `llm-client` | `@llm-series/llm-client` | ✅ Done |
 | 2 | `prompt-template` | `@llm-series/prompt-template` | ✅ Done |
 | 3 | `structured-output` | `@llm-series/structured-output` | ✅ Done |
-| 4 | `tool-registry` | `@llm-series/tool-registry` | ⏳ |
+| 4 | `tool-registry` | `@llm-series/tool-registry` | ✅ Done |
 | 5 | `simple-react-agent` | `@llm-series/simple-react-agent` | ⏳ |
 | 6 | `memory-store` | `@llm-series/memory-store` | ⏳ |
 | 7 | `chunker` + `embedder` | `@llm-series/chunker`, `@llm-series/embedder` | ⏳ |
@@ -115,6 +115,32 @@ export { parseStructured }
 - `parseStructured<T>(text, schema, options?)` — pipeline: extract → JSON.parse → Zod safeParse → typed result
 - Error hierarchy extend `StructuredOutputError` (base có `.text`): `JSONExtractionError`, `JSONParseError` (có `.raw`), `SchemaValidationError` (có `.zodError`)
 - Runtime dep duy nhất: `zod`
+
+## Module #4: tool-registry
+
+**Package:** `@llm-series/tool-registry` — `packages/tool-registry/`
+
+### Public API
+```typescript
+export type { ToolDefinition, ToolCall, ToolResult, OpenAIToolDefinition, AnthropicToolDefinition }
+export { ToolRegistryError, ToolNotFoundError, ToolInputError, ToolExecutionError }
+export { ToolRegistry }
+```
+
+### Key design decisions
+- `register(tool)` → `this` — fluent chaining; throws `ToolRegistryError` on duplicate name
+- `execute(name, argsJson)` — pipeline: JSON.parse → Zod safeParse → tool.execute(); each step throws a distinct error type
+- `toOpenAITools()` / `toAnthropicTools()` — convert Zod schemas via `zod-to-json-schema`; Anthropic format uses `input_schema.type = "object"` with `properties` and optional `required`
+- Internal state: `Map<string, ToolDefinition>` with private field (`#tools`) — no external mutation
+- `ToolDefinition.execute()` accepts `TInput` generic — typed at definition time; registry calls with `Record<string, unknown>` after Zod validates
+
+### Error hierarchy
+```
+ToolRegistryError (base)
+├── ToolNotFoundError   — tool không tồn tại; có .toolName
+├── ToolInputError      — JSON invalid hoặc Zod fail; có .toolName, .argsJson
+└── ToolExecutionError  — execute() ném lỗi; có .toolName
+```
 
 ## Quy ước chung (áp dụng cho tất cả module)
 - Package scope: `@llm-series/<module-name>`
